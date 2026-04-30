@@ -39,6 +39,13 @@ input.onLogoEvent(TouchButtonEvent.Pressed, function () {
 let color = 0
 let tirette = 0
 let haloDisplay: kitronik_halo_hd.ZIPHaloHd = null
+basic.showLeds(`
+    . . # . .
+    . . # . .
+    . . # . .
+    . . # . .
+    . . # . .
+    `)
 let countdetection = 0
 haloDisplay = kitronik_halo_hd.createZIPHaloDisplay(60)
 haloDisplay.setBrightness(100)
