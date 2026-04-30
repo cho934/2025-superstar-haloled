@@ -9,6 +9,33 @@ radio.onReceivedNumber(function (receivedNumber) {
         color = 2
     }
 })
+function Compteur100sec () {
+    couleurMatch = kitronik_halo_hd.colors(ZipLedColors.Yellow)
+    if (color == 2) {
+        couleurMatch = kitronik_halo_hd.colors(ZipLedColors.Blue)
+    }
+    haloDisplay.clear()
+    haloDisplay.show()
+    for (let j = 0; j <= 39; j++) {
+        haloDisplay.clear()
+        haloDisplay.setZipLedColor(39 - j, couleurMatch)
+        haloDisplay.show()
+        basic.pause(1000)
+    }
+    for (let l = 0; l <= 59; l++) {
+        haloDisplay.clear()
+        if (59 - l < 15) {
+            haloDisplay.setZipLedColor(59 - l, kitronik_halo_hd.colors(ZipLedColors.Red))
+        } else {
+            haloDisplay.setZipLedColor(59 - l, couleurMatch)
+        }
+        haloDisplay.show()
+        basic.pause(1000)
+    }
+    haloDisplay.clear()
+    haloDisplay.show()
+    compteurActif = 0
+}
 input.onButtonPressed(Button.A, function () {
     Clignoter()
 })
@@ -31,14 +58,22 @@ radio.onReceivedString(function (receivedString) {
     }
 })
 input.onButtonPressed(Button.B, function () {
-    color = 1
+    if (color == 1) {
+        color = 2
+    } else {
+        color = 1
+    }
 })
 input.onLogoEvent(TouchButtonEvent.Pressed, function () {
-	
+    compteurActif = 1
 })
+let compteurActif = 0
+let couleurMatch = 0
 let color = 0
 let tirette = 0
 let haloDisplay: kitronik_halo_hd.ZIPHaloHd = null
+let enabledetection = 0
+let countdetection = 0
 basic.showLeds(`
     . . # . .
     . . # . .
@@ -46,37 +81,43 @@ basic.showLeds(`
     . . # . .
     . . # . .
     `)
-let countdetection = 0
 haloDisplay = kitronik_halo_hd.createZIPHaloDisplay(60)
 haloDisplay.setBrightness(100)
 serial.redirectToUSB()
-let enabledetection = 0
 radio.setGroup(169)
 radio.setFrequencyBand(64)
 radio.setTransmitPower(7)
 tirette = 0
 color = 0
 basic.forever(function () {
+    if (compteurActif == 1) {
+        Compteur100sec()
+    }
+    basic.pause(100)
+})
+basic.forever(function () {
     while (tirette == 0) {
-        if (color == 1) {
-            basic.clearScreen()
-            basic.showIcon(IconNames.Skull)
-            haloDisplay.showColor(kitronik_halo_hd.colors(ZipLedColors.Yellow))
-        }
-        if (color == 2) {
-            basic.clearScreen()
-            basic.showIcon(IconNames.Diamond)
-            haloDisplay.showColor(kitronik_halo_hd.colors(ZipLedColors.Blue))
-        }
-        if (color == 0) {
-            basic.clearScreen()
-            basic.showLeds(`
-                # # # # #
-                # . . . #
-                # . . . #
-                # . . . #
-                # # # # #
-                `)
+        if (compteurActif == 0) {
+            if (color == 1) {
+                basic.clearScreen()
+                basic.showIcon(IconNames.Skull)
+                haloDisplay.showColor(kitronik_halo_hd.colors(ZipLedColors.Yellow))
+            }
+            if (color == 2) {
+                basic.clearScreen()
+                basic.showIcon(IconNames.Diamond)
+                haloDisplay.showColor(kitronik_halo_hd.colors(ZipLedColors.Blue))
+            }
+            if (color == 0) {
+                basic.clearScreen()
+                basic.showLeds(`
+                    # # # # #
+                    # . . . #
+                    # . . . #
+                    # . . . #
+                    # # # # #
+                    `)
+            }
         }
         basic.pause(100)
     }
@@ -84,11 +125,10 @@ basic.forever(function () {
     haloDisplay.clear()
     haloDisplay.show()
     basic.showIcon(IconNames.Angry)
-    basic.pause(85000)
+    compteurActif = 1
+    basic.pause(99000)
+    compteurActif = 0
     tirette = 0
     color = 0
     Clignoter()
-})
-basic.forever(function () {
-	
 })
